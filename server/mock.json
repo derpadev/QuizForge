@@ -1,0 +1,44 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "question": "What is $7 \\times 8$?",
+      "choices": ["48", "56", "64", "72"],
+      "correctIndex": 1,
+      "explanation": "The correct answer is $56$ because $7 \\times 8 = 56$.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "2",
+      "question": "Calculate $12 \\times 15$.",
+      "choices": ["150", "180", "165", "200"],
+      "correctIndex": 1,
+      "explanation": "The correct answer is $180$ because $12 \\times 15 = 180$.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "3",
+      "question": "Find the product of $25$ and $4$.",
+      "choices": ["75", "100", "125", "90"],
+      "correctIndex": 1,
+      "explanation": "The correct answer is $100$ because $25 \\times 4 = 100$.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "4",
+      "question": "What is $9 \\times 9$?",
+      "choices": ["72", "81", "99", "90"],
+      "correctIndex": 1,
+      "explanation": "The correct answer is $81$ because $9 \\times 9 = 81$.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "5",
+      "question": "Multiply $14$ by $6$.",
+      "choices": ["72", "90", "84", "96"],
+      "correctIndex": 2,
+      "explanation": "The correct answer is $84$ because $14 \\times 6 = 84$.",
+      "difficulty": "easy"
+    }
+  ]
+}

@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
 import OpenAI from "openai";
-
 import dotenv from "dotenv";
+import fs from "fs/promises";
+import path from "path";
+
+
 dotenv.config();
 
 const app = express();
@@ -89,6 +92,18 @@ app.post("/generate", async (req, res) => {
     res.status(500).send("Error Generating Worksheet");
   }
 });
+
+app.post("/mock", async (req, res) => {
+  console.log("Mock endpoint hit: ", req.body.topic);
+  try {
+    const filePath = path.join(process.cwd(), "mock.json");
+    const data = await fs.readFile(filePath, "utf8");
+    res.json(JSON.parse(data));
+  } catch (err) {
+    res.status(500).json({ error: "Error Reading Mock Worksheet" });
+  }
+
+})
 
 app.listen(PORT, (err) => {
   console.log("Server is running on PORT: ", PORT);

@@ -1,3 +1,5 @@
+const TEST_MODE = false;
+
 import { useEffect, useState } from "react";
 import "katex/dist/katex.min.css";
 import { BlockMath } from "react-katex";
@@ -5,7 +7,10 @@ import { InlineMath } from "react-katex";
 
 function App() {
   const [topic, setTopic] = useState("");
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState([] || null);
+  const [selectedAnswer, setSelectedAnswer] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -13,7 +18,10 @@ function App() {
 
     setLoading(true);
 
-    const url = "http://localhost:3000/generate";
+    const url = TEST_MODE
+      ? "http://localhost:3000/mock"
+      : "http://localhost:3000/generate";
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -41,21 +49,35 @@ function App() {
     }
   };
 
-  const handleClick = (choice) => {
-    setUserAnswer(choice);
+  const handleClick = (questionId, choiceIndex) => {
+    setSelectedAnswer((prev) => ({ ...prev, [questionId]: choiceIndex }));
   };
 
+  useEffect(() => {
+    console.log("selectedAnswer updated:", selectedAnswer);
+  }, [selectedAnswer]);
 
   // returns an array of objects with the text and math parts of the question
   const parseQuestion = (question) => {
-    const parts = question.split(/\%(.*?)\$/g);
-    
+    const parts = question.split(/\$(.*?)\$/g);
 
-    return parts.map((part, index) => 
-      index % 2 === 0 
-    ? {type: "text", content: part}
-    : {type: "math", content: part} )
-  }
+    return parts.map((part, index) =>
+      index % 2 === 0
+        ? { type: "text", content: part }
+        : { type: "math", content: part },
+    );
+  };
+
+  const handleExamSubmit = () => {
+    let correctCount = 0;
+
+    questions.forEach((q) => {
+      const picked = selectedAnswer[q.id];
+      if (picked === q.correctIndex) correctCount += 1;
+    });
+    setScore(correctCount);
+    setSubmitted(true);
+  };
 
   return (
     <>
@@ -89,27 +111,50 @@ function App() {
             )}
           </form>
 
-          {questions.length > 0 ? (
-            <>
-              {questions.map((questionObject, index) => {
-                 const parts = parseQuestion(questionObject.question);
-
-                 return (
-                   <p>
-                    {parts.map((part, j) => 
-                      part.type === "math"
-                      ? <BlockMath math={part.content.replaceAll("$", "")} key={j} />
-                      : <span key={j}>{part.content}</span>
-                    )}
-                   </p>
-                 )
-              })}
-            </>
-          ) : (
-            <>
-              <p>Please enter a topic</p>
-            </>
-          )}
+          {questions.map((questionObject, index) => {
+            const parts = parseQuestion(questionObject.question);
+            const choices = questionObject.choices;
+            // Debugging questions parsing
+            // console.log("parts: ", parts);
+            // console.log("choices: ", choices);
+            return (
+              <div
+                key={index}
+                className="flex flex-col justify-center h-64"
+              >
+                <div className="flex flex-row justify-center space-x-2">
+                  {parts.map((part, j) =>
+                    part.type === "math" ? (
+                      <BlockMath
+                        className="border"
+                        math={part.content.replaceAll("$", "")}
+                        key={j}
+                      />
+                    ) : (
+                      <span className="flex items-center" key={j}>
+                        {part.content}
+                      </span>
+                    ),
+                  )}
+                </div>
+                <div className="flex flex-row justify-center space-x-2">
+                  {choices.map((choice, k) => (
+                    <button
+                      type="button"
+                      key={k}
+                      onClick={() => handleClick(questionObject.id, k)}
+                      className={`border w-1/4 h-32 mx-10 hover:scale-105 active:scale-100 ${selectedAnswer[questionObject.id] === k ? "bg-blue-400" : "bg-white"}`}
+                    >
+                      <BlockMath math={choice.replaceAll("$", "")} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          <button type="button" onClick={handleExamSubmit} className="bg-green-500 rounded-lg px-2 py-1 hover:scale-105 active:bg-green-400">
+            {submitted ? `You scored ${score} out of ${questions.length}` : "SUBMIT"}
+          </button>
         </div>
       </section>
     </>
