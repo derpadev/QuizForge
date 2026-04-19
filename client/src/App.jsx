@@ -1,9 +1,8 @@
-const TEST_MODE = false;
+const TEST_MODE = true;
 
 import { useEffect, useState } from "react";
 import "katex/dist/katex.min.css";
 import { BlockMath } from "react-katex";
-import { InlineMath } from "react-katex";
 
 function App() {
   const [topic, setTopic] = useState("");
@@ -19,8 +18,8 @@ function App() {
     setLoading(true);
 
     const url = TEST_MODE
-      ? "http://localhost:3000/mock"
-      : "http://localhost:3000/generate";
+      ? "http://localhost:3000/test/mock"
+      : "http://localhost:3000/api/quiz";
 
     try {
       const response = await fetch(url, {
